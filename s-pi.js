@@ -3,6 +3,7 @@ window.addEventListener("hashchange", loadData);
 
 function loadData() {
   id = window.location.hash.substring(1);
+  console.log("ID IS: " + id);
   loadPatient(id);
 }
 

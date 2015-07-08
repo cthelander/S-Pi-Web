@@ -18,7 +18,7 @@
     "react-bootstrap": "~0.23.0",
     "react": "~0.13.3",
     "reflux": "~0.2.7",
-    "vertxbus": "*",
+    "vertxbus": "~3.0.0",
     "sockjs": "~0.3.4"
   }
 }

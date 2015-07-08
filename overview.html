@@ -367,10 +367,9 @@
 
     <!--  javaScript for the ecg graphs   -->
       <script type="text/javascript">
+        var eb = new vertx.EventBus("http://api.s-pi-demo.com/streambus");
         jQuery(function($) {
-            for(var i = 1; i <= 4; ++i) {
-                ecg_graph(i);
-            }
+            ecg_graph(eb);
            
         $("#alert_table").html("\
               <table class='table'>\

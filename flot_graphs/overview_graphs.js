@@ -1,14 +1,11 @@
 // JavaScript function for calling the api to get the graph data
 // points and populating the flot graphs. This fucntion is specifically 
 // for the ecg graphs on the overview page.
-function ecg_graph(id) {
+function ecg_graph(eb) {
     // We use an inline data source in the example, usually data would
     // be fetched from a server
-    console.log(id);
     var data = [],
     totalPoints = 300;
-
-    var eb = new vertx.EventBus("http://s-pi-demo.com/api/streambus");
 
     var updateInterval = 30;
     $("#updateInterval").val(updateInterval).change(function () {
@@ -24,48 +21,46 @@ function ecg_graph(id) {
         }
     });
 
+   // Take the api channles and turns there arguments into flot graphs 
+    function callback(dat1, dat2, dat3, dat4) {
+        [dat1, dat2, dat3, dat4].forEach(function(dats, id) {
+            eb.registerHandler(dats[0], function(msg) {
+                var dmsg = msg.data;
+                for(var i = 0; i < msg.data.length; ++i)
+                {
+                    data.push([dmsg[i].TS, dmsg[i].SIGNAL]);
+                    if (data.length > 45)
+                        data.shift();
+                    console.log(data);
+
+                    var plot = $.plot("#patient" + (id+1), [ data ], {
+                        series: {
+                            shadowSize: 0, 
+                            curvedLines: {
+                                apply: true,
+                                active: true,
+                                monotonicFit: true
+                            }
+                        },
+                        yaxis: {
+                            min: 0,
+                            max: 100
+                        },
+                        xaxis: {
+                            show: false
+                        },
+                        colors: ["#00FF33", "#00FF33"]
+                    });
+                }                               
+            });
+        });
+    }
+
     eb.onopen = function() {
-        $.when($.ajax("http://s-pi-demo.com/api/stream/numerical/hr/" + id),
-                $.ajax("http://s-pi-demo.com/api/stream/numerical/hr/" + id),
-                $.ajax("http://s-pi-demo.com/api/stream/numerical/hr/" + id),
-                $.ajax("http://s-pi-demo.com/api/stream/numerical/hr/" + id)
-            ).done(
-                function(dat1) {
-                    eb.registerHandler(dat1[0], function(msg) {
-                        var dmsg = JSON.parse(msg);
-                        console.log("getting msg x: " + dmsg.x + " y: " + dmsg.y);
-
-                        if (dmsg.y < 0) {
-                            dmsg.y = 0;
-                        } else if (dmsg.y > 100) {
-                            dmsg.y = dmsg.y % 100;
-                        }
-
-                        data.push([dmsg.x, dmsg.y]);
-                        if (data.length > 15)
-                            data.shift();
-                        console.log(data);
-
-                        var plot = $.plot("#patient" + id, [ data ], {
-                            series: {
-                                shadowSize: 0, // Drawing is faster without shadows
-                                curvedLines: {
-                                    apply: true,
-                                    active: true,
-                                    monotonicFit: true
-                                }
-                            },
-                            yaxis: {
-                                min: 0,
-                                max: 100
-                            },
-                            xaxis: {
-                                show: false
-                            },
-                            colors: ["#00FF33", "#00FF33"]
-                        });
-                    })
-                }
-        )
+        $.when($.ajax("http://api.s-pi-demo.com/stream/waveform/bp/1"),
+                $.ajax("http://api.s-pi-demo.com/stream/waveform/bp/2"),
+                $.ajax("http://api.s-pi-demo.com/stream/waveform/bp/3"),
+                $.ajax("http://api.s-pi-demo.com/stream/waveform/bp/4")
+            ).done(callback)
     }
 }
