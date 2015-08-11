@@ -49,11 +49,26 @@ function loadPatient(id) {
     $( "#age").html(data["age"]);
     $( "#bed").html(data["bed"]);
     $( "#status").html(data["status"]);
+    $( ".patient-id").html(data["patient_id"]);
+    $( ".hospital-id").html(data["hospital_admission_id"]);
+    $( ".case-id").html(data["case_id"]);
+    $( ".weight-text").html(data["weight"]);
+    $( ".height-text").html(data["height"]);
+    $( ".allergies-text").html(data["allergies"]);   
+    $( ".bp-text").html(data["blood_pressure"]); 
+    $( ".temp").html(data["temperature"].toFixed(1)); 
+    $( ".heart-rate-text").html(data["heart-rate"]); 
+    if (data["cardiac"] == true) {
+      $( ".cardiac-text").html("True");
+    } else {
+      $( ".cardiac-text").html("False");
+    }
+
   });
-    
+
   $.getJSON('/patients.json', function(data) {
     patient_data = data['patients'][id];
-    $( "div#dataModal .modal-body" ).html(patient_data['clinical-data']['html']);
+//    $( "div#dataModal .modal-body" ).html(patient_data['clinical-data']['html']);
     $( "div#labsModal .modal-body" ).html(patient_data['labs-data']['html']);
     $( "div#medsModal .modal-body" ).html(patient_data['meds-data']['html']);
     $( "div#progressModal .modal-body" ).html(patient_data['progress-data']['html']);
